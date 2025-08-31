@@ -152,3 +152,38 @@ FILE_STORAGE_PATH = os.getenv('FILE_STORAGE_PATH', 'media/')
 # File upload settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB
+
+# Hugging Face API Settings
+HUGGINGFACE_REQUEST_DELAY = float(os.getenv('HUGGINGFACE_REQUEST_DELAY', '2.0'))
+BATCH_SIZE = int(os.getenv('BATCH_SIZE', '5'))
+
+# Hugging Face Model URLs
+HUGGINGFACE_TABLE_DETECTION_MODEL = "microsoft/table-transformer-detection"
+HUGGINGFACE_TABLE_STRUCTURE_MODEL = "microsoft/table-transformer-structure-recognition"
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'logs' / 'chartsense.log',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'analyzer': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+
+# Create logs directory if it doesn't exist
+(BASE_DIR / 'logs').mkdir(exist_ok=True)
