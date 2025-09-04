@@ -154,31 +154,62 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024   # 10 MB
 
 # Hugging Face API Settings
-HUGGINGFACE_REQUEST_DELAY = float(os.getenv('HUGGINGFACE_REQUEST_DELAY', '2.0'))
+HUGGINGFACE_REQUEST_DELAY = float(os.getenv('HUGGINGFACE_REQUEST_DELAY', '1.0'))
 BATCH_SIZE = int(os.getenv('BATCH_SIZE', '5'))
 
-# Hugging Face Model URLs
-HUGGINGFACE_TABLE_DETECTION_MODEL = "microsoft/table-transformer-detection"
-HUGGINGFACE_TABLE_STRUCTURE_MODEL = "microsoft/table-transformer-structure-recognition"
+# Updated Hugging Face Model URLs - Using models that work with Inference API
+HUGGINGFACE_TABLE_DETECTION_MODEL = os.getenv(
+    'HUGGINGFACE_TABLE_DETECTION_MODEL', 
+    'TahaDouaji/detr-doc-table-detection'  # Alternative model that works with Inference API
+)
+HUGGINGFACE_TABLE_STRUCTURE_MODEL = os.getenv(
+    'HUGGINGFACE_TABLE_STRUCTURE_MODEL',
+    'microsoft/table-transformer-structure-recognition-v1.1-all'
+)
+
+# OCR Settings (fallback when ML models fail)
+USE_OCR_FALLBACK = os.getenv('USE_OCR_FALLBACK', 'True').lower() == 'true'
+ENABLE_FALLBACK_TABLE_DETECTION = os.getenv('ENABLE_FALLBACK_TABLE_DETECTION', 'True').lower() == 'true'
+
+# Table Extraction Settings
+TABLE_CONFIDENCE_THRESHOLD = float(os.getenv('TABLE_CONFIDENCE_THRESHOLD', '0.3'))
+MAX_TABLES_PER_PAGE = int(os.getenv('MAX_TABLES_PER_PAGE', '5'))
 
 # Logging configuration
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / 'logs' / 'chartsense.log',
+            'formatter': 'verbose',
         },
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
+            'formatter': 'simple',
         },
     },
     'loggers': {
         'analyzer': {
             'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,
         },
